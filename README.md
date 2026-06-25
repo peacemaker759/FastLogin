@@ -1,4 +1,4 @@
-# FastLogin — Быстрый вход через Cookie
+# <img src="https://github.com/user-attachments/assets/7eb4525d-2701-4383-a839-393fb2b39f87" width="48" height="48" alt="icon_48" style="vertical-align: middle; margin-right: 10px;"> FastLogin — Быстрый вход через Cookie
 
 **FastLogin** — это легкое и безопасное браузерное расширение для Chrome и Firefox, которое позволяет мгновенно переключаться между аккаунтами на любых сайтах с помощью сохранения и подмены файлов cookie.
 
