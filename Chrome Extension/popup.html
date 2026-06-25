@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>FastLogin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Шапка расширения -->
+    <header class="app-header">
+      <div class="logo-area">
+        <svg class="app-logo" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+          <polyline points="10 17 15 12 10 7" />
+          <line x1="15" y1="12" x2="3" y2="12" />
+        </svg>
+        <h1>FASTLOGIN</h1>
+      </div>
+      
+      <!-- Правая часть шапки: переключатель тем (кисточка) и домен -->
+      <div class="header-right">
+        <button id="theme-toggle" class="theme-toggle-btn" title="Настройка темы">
+          <svg class="theme-icon brush-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 22 .75-3c.5-2 1.5-3.5 2.5-4.5L21 9l-6-6-5.5 5.75c-1 1-2.5 2-4.5 2.5L2 12l10 10z" />
+            <path d="m16 5 3 3" />
+          </svg>
+        </button>
+        <div class="domain-badge" id="current-domain" title="Текущий домен">Загрузка...</div>
+      </div>
+    </header>
+
+    <!-- Панель настройки тем (скрыта по умолчанию) -->
+    <div id="theme-menu" class="theme-menu hidden">
+      <div class="theme-menu-section">
+        <h3>Готовые темы</h3>
+        <div class="theme-presets-grid">
+          <button class="theme-preset-btn" data-index="0">Mono Light</button>
+          <button class="theme-preset-btn" data-index="1">Mono Dark</button>
+          <button class="theme-preset-btn" data-index="2">Sage Green</button>
+          <button class="theme-preset-btn" data-index="3">Nord Slate</button>
+        </div>
+      </div>
+
+      <div class="theme-menu-section">
+        <h3>Цвет фона</h3>
+        <div class="custom-theme-options" id="custom-bg-picker"></div>
+      </div>
+
+      <div class="theme-menu-section">
+        <h3>Цвет текста</h3>
+        <div class="custom-theme-options" id="custom-text-picker"></div>
+      </div>
+
+      <div class="theme-menu-section">
+        <h3>Цвет кнопок</h3>
+        <div class="custom-theme-options" id="custom-accent-picker"></div>
+      </div>
+    </div>
+
+    <!-- Основной контент -->
+    <main class="app-main">
+      <!-- Список профилей -->
+      <div id="profiles-container" class="profiles-list">
+        <!-- Будет заполняться динамически через JS -->
+      </div>
+
+      <!-- Пустое состояние -->
+      <div id="empty-state" class="empty-state hidden">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="8" y1="12" x2="16" y2="12" />
+        </svg>
+        <p>Нет профилей для этого сайта</p>
+        <span>Создайте первый профиль, чтобы сохранить текущую сессию.</span>
+      </div>
+    </main>
+
+    <!-- Подвал расширения -->
+    <footer class="app-footer">
+      <button id="btn-add-profile" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+        Добавить профиль
+      </button>
+      <button id="btn-reset-session" class="btn btn-secondary" title="Очистить все cookies, localStorage и sessionStorage для этого сайта">
+        Сбросить сессию
+      </button>
+    </footer>
+
+    <!-- Форма создания/редактирования профиля (модальное окно) -->
+    <div id="form-overlay" class="overlay hidden">
+      <div class="modal">
+        <h2 id="modal-title">Новый профиль</h2>
+        
+        <div class="form-group">
+          <label for="profile-name">Название</label>
+          <input type="text" id="profile-name" placeholder="Например, Личный, Работа..." autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label>Иконка</label>
+          <div class="icon-selector" id="icon-picker">
+            <!-- Иконка 1: Пользователь -->
+            <label class="icon-option">
+              <input type="radio" name="icon-choice" value="user" checked>
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+              </div>
+            </label>
+            <!-- Иконка 2: Защита -->
+            <label class="icon-option">
+              <input type="radio" name="icon-choice" value="shield">
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+              </div>
+            </label>
+            <!-- Иконка 3: Ключ -->
+            <label class="icon-option">
+              <input type="radio" name="icon-choice" value="key">
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" /></svg>
+              </div>
+            </label>
+            <!-- Иконка 4: Портфель -->
+            <label class="icon-option">
+              <input type="radio" name="icon-choice" value="briefcase">
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>
+              </div>
+            </label>
+            <!-- Иконка 5: Глобус -->
+            <label class="icon-option">
+              <input type="radio" name="icon-choice" value="globe">
+              <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="color-header">
+            <label>Цвет акцента</label>
+            <span id="color-hex-label">#000000</span>
+          </div>
+          <div class="color-selector" id="color-picker">
+            <!-- Пресет 1: Черный -->
+            <label class="color-option">
+              <input type="radio" name="color-choice" value="#000000" checked>
+              <div class="color-swatch" style="background-color: #000000;"></div>
+            </label>
+            <!-- Пресет 2: Серый -->
+            <label class="color-option">
+              <input type="radio" name="color-choice" value="#64748b">
+              <div class="color-swatch" style="background-color: #64748b;"></div>
+            </label>
+            <!-- Пресет 3: Красный -->
+            <label class="color-option">
+              <input type="radio" name="color-choice" value="#ef4444">
+              <div class="color-swatch" style="background-color: #ef4444;"></div>
+            </label>
+            <!-- Пресет 4: Оранжевый -->
+            <label class="color-option">
+              <input type="radio" name="color-choice" value="#f97316">
+              <div class="color-swatch" style="background-color: #f97316;"></div>
+            </label>
+            <!-- Пресет 5: Зеленый -->
+            <label class="color-option">
+              <input type="radio" name="color-choice" value="#10b981">
+              <div class="color-swatch" style="background-color: #10b981;"></div>
+            </label>
+            <!-- Пресет 6: Синий -->
+            <label class="color-option">
+              <input type="radio" name="color-choice" value="#3b82f6">
+              <div class="color-swatch" style="background-color: #3b82f6;"></div>
+            </label>
+            <!-- Пресет 7: Фиолетовый -->
+            <label class="color-option">
+              <input type="radio" name="color-choice" value="#8b5cf6">
+              <div class="color-swatch" style="background-color: #8b5cf6;"></div>
+            </label>
+            <!-- Пресет 8: Розовый -->
+            <label class="color-option">
+              <input type="radio" name="color-choice" value="#ec4899">
+              <div class="color-swatch" style="background-color: #ec4899;"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button id="btn-cancel" class="btn btn-secondary">Отмена</button>
+          <button id="btn-save" class="btn btn-primary">Сохранить</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Системные уведомления -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
